@@ -1,0 +1,35 @@
+{
+  "name": "kimi-session-mcp",
+  "version": "0.0.3",
+  "description": "Cross-session messaging for Kimi Code through the local REST API",
+  "type": "module",
+  "bin": {
+    "kimi-session-mcp": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "check": "node --check src/index.js && node --check src/kimi-api.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "zod": "^4.3.6"
+  },
+  "keywords": [
+    "kimi-code",
+    "mcp",
+    "mcp-server",
+    "agent-to-agent",
+    "session-messaging"
+  ],
+  "author": "Alexander Yavorsky (KekcuHa)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KekcuHa/kimi-session-mcp.git"
+  },
+  "homepage": "https://github.com/KekcuHa/kimi-session-mcp#readme",
+  "bugs": "https://github.com/KekcuHa/kimi-session-mcp/issues",
+  "license": "MIT"
+}
