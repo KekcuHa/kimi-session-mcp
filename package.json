@@ -1,0 +1,22 @@
+{
+  "name": "kimi-session-mcp",
+  "version": "0.0.1",
+  "description": "Cross-session messaging for Kimi Code through the local REST API",
+  "type": "module",
+  "bin": {
+    "kimi-session-mcp": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "check": "node --check src/index.js && node --check src/kimi-api.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "zod": "^4.3.6"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}
