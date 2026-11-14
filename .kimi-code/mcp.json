@@ -1,11 +1,3 @@
 {
-  "mcpServers": {
-    "kimi-sessions": {
-      "command": "/usr/bin/node",
-      "args": ["/home/walker/oc.t-rosta.com/IT/kimi-session-mcp/src/index.js"],
-      "cwd": "/home/walker/oc.t-rosta.com/IT/kimi-session-mcp",
-      "startupTimeoutMs": 30000,
-      "toolTimeoutMs": 30000
-    }
-  }
+  "mcpServers": {}
 }

@@ -8,7 +8,7 @@ import { KimiApi } from "./kimi-api.js";
 const api = new KimiApi();
 const server = new McpServer({
   name: "kimi-session-mcp",
-  version: "0.0.1",
+  version: "0.0.2",
 });
 
 function result(value) {
