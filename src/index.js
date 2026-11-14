@@ -8,7 +8,7 @@ import { KimiApi } from "./kimi-api.js";
 const api = new KimiApi();
 const server = new McpServer({
   name: "kimi-session-mcp",
-  version: "0.0.2",
+  version: "0.0.3",
 });
 
 function result(value) {
@@ -63,6 +63,16 @@ server.registerTool("SendMessage", {
     steer: z.boolean().default(true).describe("Deliver a queued message to the active turn instead of waiting for the next turn"),
   },
 }, async (args) => handle(() => api.sendMessage(args)));
+
+server.registerTool("ManageSession", {
+  title: "Archive, restore, reload, take over or delete a Kimi Code session",
+  description: "Run a session lifecycle action through the Server API colon endpoints: archive (hides from the default list), restore, reload, takeover (break another holder's lock), delete (irreversible, requires confirm=true). Actions map to POST /api/v1/sessions/{id}:{action}.",
+  inputSchema: {
+    session: z.string().min(1).describe("Exact session name or session_ ID"),
+    action: z.enum(["archive", "restore", "reload", "takeover", "delete"]).describe("Lifecycle action to run"),
+    confirm: z.boolean().default(false).describe('Required to be true for the irreversible "delete" action'),
+  },
+}, async (args) => handle(() => api.manageSession(args)));
 
 server.registerTool("GetMessages", {
   title: "Read Kimi Code session messages",

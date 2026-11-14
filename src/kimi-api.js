@@ -103,7 +103,7 @@ export class KimiApi {
       .map(presentSession);
   }
 
-  async resolveSession(reference) {
+  async resolveSession(reference, { includeArchived = false } = {}) {
     const normalized = reference.trim().replace(/^@/, "");
     if (!normalized) {
       throw new KimiApiError("Session reference cannot be empty", "INVALID_SESSION");
@@ -112,7 +112,7 @@ export class KimiApi {
       return presentSession(await this.request(`/api/v1/sessions/${encodeURIComponent(normalized)}`));
     }
 
-    const matches = (await this.listSessions()).filter((session) => session.name === normalized);
+    const matches = (await this.listSessions({ includeArchived })).filter((session) => session.name === normalized);
     if (matches.length === 0) {
       throw new KimiApiError(`No session named "${normalized}"`, "SESSION_NOT_FOUND");
     }
@@ -171,6 +171,22 @@ export class KimiApi {
       from: sender,
       to: recipient,
     };
+  }
+
+  async manageSession({ session, action, confirm = false }) {
+    const allowed = ["archive", "restore", "reload", "takeover", "delete"];
+    if (!allowed.includes(action)) {
+      throw new KimiApiError(`Unsupported action "${action}"; allowed: ${allowed.join(", ")}`, "INVALID_ACTION");
+    }
+    if (action === "delete" && confirm !== true) {
+      throw new KimiApiError('Action "delete" is irreversible; pass confirm: true to proceed', "CONFIRM_REQUIRED");
+    }
+    const target = await this.resolveSession(session, { includeArchived: true });
+    const data = await this.request(`/api/v1/sessions/${encodeURIComponent(target.id)}:${action}`, {
+      method: "POST",
+      body: {},
+    });
+    return { action, session: target, result: data };
   }
 
   async getMessages({ session, limit = 10, afterId }) {
