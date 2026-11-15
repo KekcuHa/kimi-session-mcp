@@ -1,6 +1,6 @@
 {
   "name": "kimi-session-mcp",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Cross-session messaging for Kimi Code through the local REST API",
   "type": "module",
   "bin": {

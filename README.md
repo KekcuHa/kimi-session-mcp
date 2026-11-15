@@ -36,7 +36,7 @@ npm install
 kimi web --no-open
 ```
 
-The API server must be running while sessions exchange messages. The default API address is `http://127.0.0.1:58627`; the token is read from `~/.kimi-code/server.token` and is never written to the MCP log.
+The API server must be running while sessions exchange messages. The desktop app picks the API port dynamically: unless `KIMI_SESSION_MCP_BASE_URL` is set, the address is auto-discovered from `~/.kimi-code/server/instances/*.json` (the instance with the freshest `heartbeat_at`, cached for 30 s; `http://127.0.0.1:58627` is the final fallback). The token is read from `~/.kimi-code/server.token` and is never written to the MCP log.
 
 ## Connecting to Kimi Code
 
@@ -99,7 +99,7 @@ POST /api/v1/sessions/<session_id>/profile
 
 ## Environment settings
 
-- `KIMI_SESSION_MCP_BASE_URL` — API address, default `http://127.0.0.1:58627`.
+- `KIMI_SESSION_MCP_BASE_URL` — API address; when unset, auto-discovered from `~/.kimi-code/server/instances/*.json` (fallback `http://127.0.0.1:58627`).
 - `KIMI_SESSION_MCP_TOKEN` — explicit token instead of reading the file.
 - `KIMI_SESSION_MCP_TOKEN_PATH` — alternative token file path.
 - `KIMI_SESSION_MCP_HTTP_TIMEOUT_MS` — REST request timeout, default `15000`.
@@ -172,7 +172,7 @@ npm install
 kimi web --no-open
 ```
 
-Сервер API должен работать во время обмена. По умолчанию используется `http://127.0.0.1:58627`, а токен читается из `~/.kimi-code/server.token`. Токен не выводится в MCP-журнал.
+Сервер API должен работать во время обмена. У desktop-приложения порт API динамический: если `KIMI_SESSION_MCP_BASE_URL` не задан, адрес определяется автоматически из `~/.kimi-code/server/instances/*.json` (экземпляр с самым свежим `heartbeat_at`, кеш 30 с; последний фолбэк — `http://127.0.0.1:58627`). Токен читается из `~/.kimi-code/server.token`. Токен не выводится в MCP-журнал.
 
 ## Подключение к Kimi Code
 
@@ -235,7 +235,7 @@ POST /api/v1/sessions/<session_id>/profile
 
 ## Настройки окружения
 
-- `KIMI_SESSION_MCP_BASE_URL` — адрес API, по умолчанию `http://127.0.0.1:58627`.
+- `KIMI_SESSION_MCP_BASE_URL` — адрес API; если не задан, определяется из `~/.kimi-code/server/instances/*.json` (фолбэк `http://127.0.0.1:58627`).
 - `KIMI_SESSION_MCP_TOKEN` — явный токен вместо чтения файла.
 - `KIMI_SESSION_MCP_TOKEN_PATH` — другой путь к файлу токена.
 - `KIMI_SESSION_MCP_HTTP_TIMEOUT_MS` — таймаут REST-запроса, по умолчанию `15000`.

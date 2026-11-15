@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
@@ -35,13 +35,49 @@ export function messageText(message) {
 
 export class KimiApi {
   constructor(options = {}) {
-    this.baseUrl = (options.baseUrl || process.env.KIMI_SESSION_MCP_BASE_URL || "http://127.0.0.1:58627").replace(/\/$/, "");
+    this.kimiCodeHome = process.env.KIMI_CODE_HOME || join(homedir(), ".kimi-code");
+    this.fixedBaseUrl = (options.baseUrl || process.env.KIMI_SESSION_MCP_BASE_URL || "").replace(/\/$/, "") || null;
+    this.discoveredBaseUrl = null;
+    this.discoveredAt = 0;
     this.token = options.token || process.env.KIMI_SESSION_MCP_TOKEN;
     this.tokenPath = options.tokenPath || process.env.KIMI_SESSION_MCP_TOKEN_PATH || join(
-      process.env.KIMI_CODE_HOME || join(homedir(), ".kimi-code"),
+      this.kimiCodeHome,
       "server.token",
     );
     this.timeoutMs = Number(process.env.KIMI_SESSION_MCP_HTTP_TIMEOUT_MS || 15000);
+  }
+
+  async discoverBaseUrl() {
+    try {
+      const dir = join(this.kimiCodeHome, "server", "instances");
+      const files = await readdir(dir);
+      let best = null;
+      for (const file of files) {
+        if (!file.endsWith(".json")) continue;
+        try {
+          const instance = JSON.parse(await readFile(join(dir, file), "utf8"));
+          if (instance.host && instance.port && (!best || (instance.heartbeat_at || 0) > (best.heartbeat_at || 0))) {
+            best = instance;
+          }
+        } catch {
+          // пропускаем битые файлы
+        }
+      }
+      if (best) return `http://${best.host}:${best.port}`;
+    } catch {
+      // нет каталога instances — откатываемся на дефолт
+    }
+    return null;
+  }
+
+  async getBaseUrl() {
+    if (this.fixedBaseUrl) return this.fixedBaseUrl;
+    const now = Date.now();
+    if (!this.discoveredBaseUrl || now - this.discoveredAt > 30000) {
+      this.discoveredBaseUrl = (await this.discoverBaseUrl()) || this.discoveredBaseUrl || "http://127.0.0.1:58627";
+      this.discoveredAt = now;
+    }
+    return this.discoveredBaseUrl;
   }
 
   async getToken() {
@@ -55,9 +91,10 @@ export class KimiApi {
   }
 
   async request(path, { method = "GET", body } = {}) {
+    const baseUrl = await this.getBaseUrl();
     let response;
     try {
-      response = await fetch(`${this.baseUrl}${path}`, {
+      response = await fetch(`${baseUrl}${path}`, {
         method,
         headers: {
           Authorization: `Bearer ${await this.getToken()}`,
@@ -67,7 +104,9 @@ export class KimiApi {
         signal: AbortSignal.timeout(this.timeoutMs),
       });
     } catch (error) {
-      throw new KimiApiError(`Cannot reach the Kimi API at ${this.baseUrl}: ${error.message}`, "API_UNAVAILABLE");
+      // при недоступности забываем дискавери — следующий запрос перечитает instances
+      this.discoveredAt = 0;
+      throw new KimiApiError(`Cannot reach the Kimi API at ${baseUrl}: ${error.message}`, "API_UNAVAILABLE");
     }
 
     const payload = await response.json().catch(() => null);
