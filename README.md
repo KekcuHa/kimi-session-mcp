@@ -250,6 +250,19 @@ POST /api/v1/sessions/<session_id>/profile
 - Архивировать/восстановить: `POST /api/v1/sessions/{id}:archive`, пакетно — `POST /api/v2/sessions:archive` / `:restore`.
 - Также есть `:reload` и `:takeover`. Полный список маршрутов: `GET /openapi.json`.
 
+## Прямой доступ без MCP (запасной путь)
+
+Если в текущем сеансе инструментов `mcp__kimi-sessions__*` нет (старая сессия, не
+подхватившая `mcp.json`), те же вызовы можно выполнить curl'ом напрямую в локальный API
+`kimi web` (проверено 15.11.2026, Kimi 2.6.1):
+
+- адрес берётся из `~/.kimi-code/server/instances/*.json` (поля `host`/`port`; внимание:
+  `host` может быть LAN-IP вроде 192.168.x.x, а не 127.0.0.1 — fallback
+  `http://127.0.0.1:58627` тогда не сработает);
+- токен — `~/.kimi-code/server.token`, заголовок `Authorization: Bearer …`;
+- список сеансов: `GET /api/v1/sessions?limit=50` (ответ обёрнут: `{"data":{"items":[…]}}`);
+- отправка сообщения: `POST /api/v1/sessions/<id>/prompts` — см. `src/kimi-api.js`.
+
 ## Ограничения
 
 - Один экземпляр MCP работает с одним адресом `kimi web`; автоматического объединения нескольких API-серверов нет.
