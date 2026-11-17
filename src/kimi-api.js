@@ -213,7 +213,7 @@ export class KimiApi {
   }
 
   async manageSession({ session, action, confirm = false }) {
-    const allowed = ["archive", "restore", "reload", "takeover", "delete"];
+    const allowed = ["archive", "restore", "reload", "takeover", "compact", "delete"];
     if (!allowed.includes(action)) {
       throw new KimiApiError(`Unsupported action "${action}"; allowed: ${allowed.join(", ")}`, "INVALID_ACTION");
     }

@@ -11,7 +11,7 @@ Built to scratch an itch also tracked upstream as [kimi-code#4232](https://githu
 - `ListAgents` — list unarchived sessions with title, ID, working directory and busy state.
 - `SendMessage` — send text to a session by exact title or `session_…` ID, with sender and reply-to.
 - `GetMessages` — read a session's recent text messages, including replies from other sessions.
-- `ManageSession` — archive, restore, reload, take over or delete a session through Kimi's colon endpoints. Deletion is irreversible and requires `confirm: true`.
+- `ManageSession` — archive, restore, reload, take over, compact or delete a session through Kimi's colon endpoints. `compact` starts context compaction (same as the `/compact` command). Deletion is irreversible and requires `confirm: true`.
 
 Delivery uses Kimi's native prompt queue. With `steer=true` a running turn can also consume the message immediately. No broker and no permanent MCP process: Kimi launches the server over stdio.
 
@@ -79,7 +79,7 @@ Direct `SendMessage` arguments:
 `ManageSession` arguments:
 
 - `session` — exact title or ID; archived sessions are resolved too.
-- `action` — `archive`, `restore`, `reload`, `takeover` or `delete`.
+- `action` — `archive`, `restore`, `reload`, `takeover`, `compact` or `delete`.
 - `confirm` — must be `true` for the irreversible `delete` action.
 
 `from` is required: stdio MCP does not receive the calling session's ID from Kimi, so the server does not guess it from the directory or busy state.
@@ -215,7 +215,7 @@ kimi web --no-open
 Аргументы `ManageSession`:
 
 - `session` — точное название или ID; архивные сеансы тоже разрешаются.
-- `action` — `archive`, `restore`, `reload`, `takeover` или `delete`.
+- `action` — `archive`, `restore`, `reload`, `takeover`, `compact` или `delete`.
 - `confirm` — обязательно `true` для необратимого `delete`.
 
 `from` обязателен: stdio MCP не получает от Kimi ID вызвавшего сеанса, поэтому сервер не пытается угадывать его по каталогу или занятости.
