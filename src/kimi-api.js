@@ -232,16 +232,39 @@ export class KimiApi {
     const target = await this.resolveSession(session);
     const params = new URLSearchParams({ page_size: String(limit) });
     if (afterId) params.set("after_id", afterId);
-    const page = await this.request(`/api/v1/sessions/${encodeURIComponent(target.id)}/messages?${params}`);
-    return {
-      session: target,
-      has_more: page.has_more,
-      messages: page.items.map((message) => ({
-        id: message.id,
-        role: message.role,
-        created_at: message.created_at,
-        text: messageText(message),
-      })),
-    };
+    try {
+      // kimi-code < 2.7
+      const page = await this.request(`/api/v1/sessions/${encodeURIComponent(target.id)}/messages?${params}`);
+      return {
+        session: target,
+        has_more: page.has_more,
+        messages: page.items.map((message) => ({
+          id: message.id,
+          role: message.role,
+          created_at: message.created_at,
+          text: messageText(message),
+        })),
+      };
+    } catch (error) {
+      if (!(error instanceof KimiApiError) || Number(error.code) !== 404) throw error;
+    }
+    // kimi-code >= 2.7: история переехала на /agents/main/turns (маршрут /messages убран).
+    // after_id там не поддержан — возвращается последняя страница ходов целиком.
+    const data = await this.request(
+      `/api/v1/sessions/${encodeURIComponent(target.id)}/agents/main/turns?page_size=${limit}`,
+    );
+    const messages = [];
+    for (const turn of data.turns || []) {
+      for (const item of turn.items || []) {
+        if (item.type !== "user_message" && item.type !== "assistant_message") continue;
+        messages.push({
+          id: item.item_id,
+          role: item.type === "user_message" ? "user" : "assistant",
+          created_at: item.created_at,
+          text: item.text || "",
+        });
+      }
+    }
+    return { session: target, has_more: data.has_more, messages };
   }
 }

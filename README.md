@@ -10,7 +10,7 @@ Built to scratch an itch also tracked upstream as [kimi-code#4232](https://githu
 
 - `ListAgents` — list unarchived sessions with title, ID, working directory and busy state.
 - `SendMessage` — send text to a session by exact title or `session_…` ID, with sender and reply-to.
-- `GetMessages` — read a session's recent text messages, including replies from other sessions.
+- `GetMessages` — read a session's recent text messages, including replies from other sessions. On Kimi Code ≥ 2.7 it automatically switches to the new `GET /sessions/{id}/agents/main/turns` route (the old `/messages` route was removed in 2.7.0; `after_id` is not supported by the fallback).
 - `ManageSession` — archive, restore, reload, take over, compact or delete a session through Kimi's colon endpoints. `compact` starts context compaction (same as the `/compact` command). Deletion is irreversible and requires `confirm: true`.
 
 Delivery uses Kimi's native prompt queue. With `steer=true` a running turn can also consume the message immediately. No broker and no permanent MCP process: Kimi launches the server over stdio.
@@ -24,7 +24,7 @@ Kimi web 2.6.1 and AgentMBX 0.5.58 share one `mbx` MCP process between conversat
 ## Requirements
 
 - Node.js 22 or newer.
-- Kimi Code with its local API server (`kimi web --no-open`). Tested on Kimi Code 2.4.1 and 2.6.1.
+- Kimi Code with its local API server (`kimi web --no-open`). Tested on Kimi Code 2.4.1, 2.6.1 and 2.7.2.
 - A configured model and Kimi Code authorization.
 
 ## Install
@@ -160,7 +160,7 @@ Kimi web 2.6.1 и AgentMBX 0.5.58 разделяют один `mbx` MCP-проц
 ## Требования
 
 - Node.js 22 или новее.
-- Kimi Code с локальным сервером API (`kimi web --no-open`). Проверено на Kimi Code 2.4.1 и 2.6.1.
+- Kimi Code с локальным сервером API (`kimi web --no-open`). Проверено на Kimi Code 2.4.1, 2.6.1 и 2.7.2.
 - Настроенная модель и авторизация Kimi Code.
 
 ## Установка
